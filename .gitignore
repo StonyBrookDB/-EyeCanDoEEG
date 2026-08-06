@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.venv-psychopy/
+.claude/settings.local.json
+.claude/plans/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE configs
+.vscode/
+.idea/
+*.swp
+
+# Data / large files (small example/config files are fine to commit)
+*.csv
+*.parquet
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.npy
+*.npz
+*.joblib
+*.kenlm
+*.kenlm.gz
+*.arpa
+results/*
+!results/.gitkeep
+models/*
+!models/.gitkeep
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+# Text references
+text_resources/
+
+# Local-machine resource monitoring (hardcoded absolute paths for this
+# machine's launchd setup, not portable/reusable as-is)
+scripts/monitor_resources.py
+scripts/com.eyecando.resourcemonitor.plist

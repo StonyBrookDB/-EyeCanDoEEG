@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "eyecando"
+version = "0.1.0"
+description = "P300 event-related-potential BCI speller."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Lucas Yang" }]
+dependencies = [
+    # Core
+    "numpy",
+    "scipy",
+    # Real-time streaming
+    "pylsl",
+    # EEG data I/O
+    "mne",
+    "mne-bids",
+    "pyxdf",
+    # ML
+    "torch",
+    "scikit-learn",
+    # Language model (src/eyecando/decode/lm_decoder.py)
+    "transformers",
+    "peft",
+    # Benchmarking/datasets
+    "moabb",
+    "pyriemann",
+    # Visualization
+    "matplotlib",
+]
+# `kenlm` (src/eyecando/decode/kenlm_lm.py's alternative use_lm backend) is
+# deliberately NOT listed here -- a plain `pip install kenlm` would just
+# fail to build against this project's Python (3.14: PyPI's kenlm==0.3.0
+# ships a pre-generated Cython .cpp that doesn't compile against removed/
+# changed CPython 3.14 internals), and its default KENLM_MAX_ORDER=6 would
+# reject the specific 12-gram model this project uses regardless. Run
+# scripts/setup_kenlm.sh once per fresh .venv instead -- see this file's
+# own docstring (src/eyecando/decode/kenlm_lm.py) for model provenance,
+# license, and the tokenization convention it expects.
+# Everything else in this repo works with zero dependency on kenlm ever
+# having been installed; unit_tests/test_decode_kenlm_lm.py skips itself
+# if it hasn't.
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+    "jupyter",
+    "nbconvert",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/eyecando"]
+
+[tool.pytest.ini_options]
+testpaths = ["unit_tests"]
+filterwarnings = [
+    # moabb's own internals call deprecated matplotlib/pyriemann APIs at
+    # import time -- nothing in eyecando's own code triggers these, just
+    # importing moabb does. Re-check when moabb/pyriemann/matplotlib are
+    # upgraded; these may already be fixed upstream by then.
+    "ignore::DeprecationWarning:moabb.*",
+    "ignore::PendingDeprecationWarning:moabb.*",
+    # joblib 1.5.3's own array-restore code (numpy_pickle.py) sets
+    # array.shape directly, which numpy 2.5+ deprecates in favor of
+    # .reshape() -- fires on every joblib.load()/P300Model.load() call
+    # until joblib updates; not anything eyecando's own code does.
+    "ignore:Setting the shape on a NumPy array has been deprecated:DeprecationWarning",
+]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "unit_tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
