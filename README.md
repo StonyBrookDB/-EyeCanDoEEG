@@ -17,6 +17,13 @@ README for what it does and why it's split out the way it is:
 - [`src/eyecando/utils/`](src/eyecando/utils/README.md) -- shared run bookkeeping and constants
 - [`scripts/`](scripts/README.md) -- CLI entry points for each stage above
 
+Outside that package, [`p300-speller-multidevice/`](p300-speller-multidevice/README.md)
+is a standalone, sibling project (not imported by `eyecando`) that runs the
+same 6x6 P300 copy-spelling paradigm across four acquisition front-ends --
+a custom 16-channel serial headset, Muse2, and Emotiv EPOC Flex (two
+workflows) -- plus a classical-vs-EEGNet decoder benchmark on BNCI2014_009
+and archived Muse2 recordings.
+
 ## Setup
 
 ```bash
@@ -95,6 +102,7 @@ models/         # placeholder — populated by running training yourself
 data/
   raw/          # placeholder — point this at your own dataset
   processed/    # placeholder — derived/cleaned data lands here
+p300-speller-multidevice/  # standalone sibling project — see its own README
 ```
 
 ## Data assumptions & portability

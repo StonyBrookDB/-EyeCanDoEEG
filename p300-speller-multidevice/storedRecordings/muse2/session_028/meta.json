@@ -1,0 +1,37 @@
+{
+  "phrase": "BOLT",
+  "reps": 15,
+  "grid": [
+    "ABCDEF",
+    "GHIJKL",
+    "MNOPQR",
+    "STUVWX",
+    "YZ1234",
+    "56789_"
+  ],
+  "fs": 256.0,
+  "n_eeg": 5,
+  "eeg_names": [
+    "TP9",
+    "AF7",
+    "AF8",
+    "TP10",
+    "Right AUX"
+  ],
+  "board": "Muse",
+  "timing_ms": {
+    "on_ms": 100,
+    "off_ms": 75,
+    "cue_ms": 1000,
+    "rest_ms": 1500
+  },
+  "soa_ms": 175,
+  "code_convention": "1-6=columns, 7-12=rows",
+  "marker_channels": [
+    "code",
+    "is_target",
+    "char_idx",
+    "rep"
+  ],
+  "seed": 1
+}
