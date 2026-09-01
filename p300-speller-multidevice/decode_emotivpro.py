@@ -54,6 +54,7 @@ TMIN        = -0.1              # epoch start (s)
 TMAX        =  0.8              # epoch end (s)
 P300_WINDOW = (250, 500)        # ms — expected P300 peak window
 GRID = ["ABCDEF", "GHIJKL", "MNOPQR", "STUVWX", "YZ1234", "56789_"]
+VOLTS_TO_UV = 1e6                # MNE stores EEG in volts; convert back for display/export
 
 
 def code_pair_to_char(row_code, col_code):
@@ -283,8 +284,8 @@ def plot_erp(epochs, session_dir, bad_channels):
     good_idx = [i for i, c in enumerate(ch_names) if c not in bad_channels]
     t = epochs.times * 1000
 
-    tgt  = epochs["Target"].get_data().mean(axis=0)
-    ntgt = epochs["Non-Target"].get_data().mean(axis=0)
+    tgt  = epochs["Target"].get_data().mean(axis=0) * VOLTS_TO_UV
+    ntgt = epochs["Non-Target"].get_data().mean(axis=0) * VOLTS_TO_UV
     tgt_m, ntgt_m = tgt[good_idx].mean(0), ntgt[good_idx].mean(0)
     diff = tgt_m - ntgt_m
 
@@ -318,8 +319,8 @@ def plot_erp(epochs, session_dir, bad_channels):
 
 def plot_per_channel_erp(epochs, session_dir, bad_channels):
     t = epochs.times * 1000
-    tgt  = epochs["Target"].get_data().mean(axis=0)
-    ntgt = epochs["Non-Target"].get_data().mean(axis=0)
+    tgt  = epochs["Target"].get_data().mean(axis=0) * VOLTS_TO_UV
+    ntgt = epochs["Non-Target"].get_data().mean(axis=0) * VOLTS_TO_UV
     n_ch = tgt.shape[0]
     ncols = 4
     nrows = int(np.ceil(n_ch / ncols))
@@ -356,7 +357,7 @@ def export_csvs(raw, eeg_utc, mrk, events, session_dir):
     markers.csv gains: lsl_timestamp column (EEG sample time nearest each flash)
     """
     # --- eeg.csv ---
-    data = raw.get_data().T          # (n_samples, n_ch)
+    data = raw.get_data().T * VOLTS_TO_UV   # (n_samples, n_ch), volts -> uV
     eeg_df = pd.DataFrame(data, columns=raw.ch_names)
     eeg_df.insert(0, "lsl_timestamp", eeg_utc)
     eeg_path = os.path.join(session_dir, "eeg.csv")
