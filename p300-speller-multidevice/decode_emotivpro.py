@@ -143,7 +143,8 @@ def load_edf(edf_path, eeg_channels=None, utc_offset_hours=0):
         # starts with a known bookkeeping prefix.
         _drop_prefixes = ("TIME_STAMP", "OR_TIME_STAMP", "COUNTER",
                           "INTERPOLATED", "RAW_CQ", "CQ_", "EQ_",
-                          "MARKER", "BATTERY", "GYRO", "STATUS", "TRIGGER")
+                          "MARKER", "BATTERY", "GYRO", "STATUS", "TRIGGER",
+                          "FW")
         keep = [c for c in raw.ch_names
                 if not any(c.upper().startswith(p.upper())
                            for p in _drop_prefixes)]
