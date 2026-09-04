@@ -206,7 +206,8 @@ def run_gui(schedule, mrec, timing, on_start):
             set_all(DIM_FG)
             r, c = char_to_rc(s["target_char"])
             cells[r][c].config(fg=CUE_FG)
-            status.config(text=f"spell:  {s['target_char']}   "
+            display = "␣" if s["target_char"] == "_" else s["target_char"]
+            status.config(text=f"spell:  {display}   "
                                f"(letter {s['char_idx'] + 1})")
             root.after(timing["cue_ms"], lambda: (set_all(DIM_FG), step()))
         elif typ == "flash":
@@ -295,14 +296,15 @@ def main():
                     help="no GUI window — dry-run for pipeline testing")
     ap.add_argument("--outdir", default=None,
                     help="output dir (default: recordings/session_<n>)")
-    ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--seed", type=int, default=None,
+                    help="RNG seed for flash order (default: random)")
     ap.add_argument("--on_ms",   type=int, default=100)
     ap.add_argument("--off_ms",  type=int, default=75)
     ap.add_argument("--cue_ms",  type=int, default=1000)
     ap.add_argument("--rest_ms", type=int, default=1500)
     args = ap.parse_args()
 
-    phrase = args.phrase.upper()
+    phrase = args.phrase.upper().replace(" ", "_")
     for ch in phrase:
         char_to_rc(ch)
     timing = {
@@ -331,11 +333,12 @@ def main():
 
     mrec = MarkerRecorder(outdir, marker_outlet)
 
-    rng      = random.Random(args.seed)
+    seed     = args.seed if args.seed is not None else random.randint(0, 2**31 - 1)
+    rng      = random.Random(seed)
     schedule = build_schedule(phrase, args.reps, rng)
     n_flash  = sum(1 for s in schedule if s["type"] == "flash")
     secs     = n_flash * (args.on_ms + args.off_ms) / 1000
-    print(f"[setup] phrase={phrase!r}  reps={args.reps}  "
+    print(f"[setup] phrase={phrase!r}  reps={args.reps}  seed={seed}  "
           f"SOA={args.on_ms + args.off_ms} ms  -> {outdir}")
     print(f"[setup] {len(phrase)} chars x {args.reps} reps = "
           f"{n_flash} flashes (~{secs:.0f}s)")
@@ -375,7 +378,7 @@ def main():
         "code_convention": "1-6=columns, 7-12=rows",
         "marker_channels": ["code", "is_target", "char_idx", "rep"],
         "wall_time_epoch": "unix_utc",
-        "seed": args.seed,
+        "seed": seed,
     }
     with open(os.path.join(outdir, "meta.json"), "w") as f:
         json.dump(meta, f, indent=2)

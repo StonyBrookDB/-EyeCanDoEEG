@@ -39,6 +39,9 @@ Thumbs.db
 # Data / large files (small example/config files are fine to commit)
 *.csv
 !**/markers.csv
+*.png
+*.jpg
+*.jpeg
 *.parquet
 *.h5
 *.hdf5
