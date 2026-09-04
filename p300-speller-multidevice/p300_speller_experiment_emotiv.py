@@ -93,6 +93,36 @@ def reconstruct_phrase(marker_rows):
 # ---------------------------------------------------------------------------
 # Flash schedule
 # ---------------------------------------------------------------------------
+def _fix_target_adjacency(order, targets, last_code):
+    """Ensure the two target codes never appear back-to-back (mutates order).
+
+    Handles two cases:
+      1. Rep boundary: the previous rep ended on one target and this rep would
+         start on the other target.
+      2. Within-rep: the two target codes are adjacent anywhere in order.
+    """
+    # Case 1 — rep boundary
+    if last_code in targets and order[0] in targets and order[0] != last_code:
+        for i in range(1, len(order)):
+            if order[i] not in targets:
+                order[0], order[i] = order[i], order[0]
+                break
+
+    # Case 2 — within-rep (at most one such pair since there are only 2 targets)
+    for i in range(len(order) - 1):
+        if order[i] in targets and order[i + 1] in targets:
+            # Prefer swapping the later one forward
+            for j in range(i + 2, len(order)):
+                if order[j] not in targets:
+                    order[i + 1], order[j] = order[j], order[i + 1]
+                    return
+            # Fallback: swap the earlier one backward
+            for j in range(i - 1, -1, -1):
+                if order[j] not in targets:
+                    order[i], order[j] = order[j], order[i]
+                    return
+
+
 def build_schedule(phrase, reps, rng):
     steps = []
     last_code = None
@@ -103,8 +133,11 @@ def build_schedule(phrase, reps, rng):
         for rep in range(1, reps + 1):
             order = list(range(1, 13))
             rng.shuffle(order)
+            # Avoid repeating the exact same code across the rep boundary
             if order[0] == last_code and len(order) > 1:
                 order[0], order[1] = order[1], order[0]
+            # Avoid target row & column flashing consecutively
+            _fix_target_adjacency(order, targets, last_code)
             for code in order:
                 steps.append({
                     "type": "flash",
