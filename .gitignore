@@ -36,6 +36,9 @@ Thumbs.db
 .idea/
 *.swp
 
+# LaTeX paper drafts (kept outside this repo)
+*.tex
+
 # Data / large files (small example/config files are fine to commit)
 *.csv
 !**/markers.csv

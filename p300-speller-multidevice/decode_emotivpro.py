@@ -16,6 +16,9 @@ How alignment works
 
 Usage
 -----
+    # edf_file is optional if session_dir has exactly one *.edf (excl. *.md.edf):
+    python decode_emotivpro.py recordings/session_001/
+
     python decode_emotivpro.py recordings/session_001/ path/to/recording.edf
 
     # specify which EDF channels to use as EEG (comma-separated, no spaces):
@@ -27,10 +30,18 @@ Dependencies
     pip install mne pyriemann scikit-learn matplotlib
 """
 import argparse
+import glob
 import json
 import os
 import sys
 import warnings
+
+if hasattr(sys.stdout, "reconfigure"):
+    # Windows consoles often default stdout to cp1252, which can't encode
+    # the µV/← characters this script prints -- force UTF-8 so it never
+    # depends on PYTHONIOENCODING or the console's codepage.
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 import matplotlib
 matplotlib.use("Agg")           # headless-safe; change to "TkAgg" if you want pop-up windows
@@ -472,8 +483,10 @@ def main():
     )
     ap.add_argument("session_dir",
                     help="path to recordings/session_NNN/ folder")
-    ap.add_argument("edf_file",
-                    help="path to the EmotivPRO exported .edf file")
+    ap.add_argument("edf_file", nargs="?", default=None,
+                    help="path to the EmotivPRO exported .edf file "
+                         "(default: auto-detect the one .edf in session_dir, "
+                         "excluding *.md.edf)")
     ap.add_argument("--eeg-channels", default=None,
                     help="comma-separated list of EEG channel names to use "
                          "(default: auto-detect, skip non-EEG channels)")
@@ -485,12 +498,30 @@ def main():
     args = ap.parse_args()
 
     session_dir = args.session_dir
-    edf_path    = args.edf_file
     eeg_channels = ([c.strip() for c in args.eeg_channels.split(",")]
                     if args.eeg_channels else None)
 
     if not os.path.isdir(session_dir):
         sys.exit(f"session dir not found: {session_dir}")
+
+    edf_path = args.edf_file
+    if edf_path is None:
+        candidates = sorted(
+            f for f in glob.glob(os.path.join(session_dir, "*.edf"))
+            if not f.lower().endswith(".md.edf")
+        )
+        if not candidates:
+            sys.exit(f"No .edf file found in {session_dir} (excluding *.md.edf) "
+                      "-- pass the path explicitly.")
+        if len(candidates) > 1:
+            sys.exit(f"Multiple .edf files found in {session_dir}, pass one explicitly:\n  "
+                      + "\n  ".join(candidates))
+        edf_path = candidates[0]
+        print(f"[load] auto-detected EDF: {edf_path}")
+    elif edf_path.lower().endswith(".md.edf"):
+        sys.exit(f"{edf_path} looks like a *.md.edf metadata file, not the "
+                  "main EDF recording -- pass the plain .edf file instead.")
+
     if not os.path.isfile(edf_path):
         sys.exit(f"EDF file not found: {edf_path}")
 
