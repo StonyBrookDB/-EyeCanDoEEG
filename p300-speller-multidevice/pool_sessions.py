@@ -330,7 +330,7 @@ def main(session_dirs, n_perm=1000, auc_perm=1000, seed=0, bad_channel_frac=0.25
     ax.axhline(0, color="gray", lw=0.8)
     ax.axvline(0, color="gray", lw=0.8)
     ax.set_xlabel("Time (ms)")
-    ax.set_ylabel("Amplitude (raw ADC counts)")
+    ax.set_ylabel("Amplitude (µV)")
     ax.set_title(f"Pooled ERP across {len(session_dirs)} sessions "
                  f"(mean of {len(good_idx)}/{len(ch_names_ref)} channels)")
     ax.legend()
@@ -351,8 +351,9 @@ def main(session_dirs, n_perm=1000, auc_perm=1000, seed=0, bad_channel_frac=0.25
                 label=f"null 95th pct. ({auc_perm} shuffles)")
     ax.set_xlabel("Repetitions accumulated")
     ax.set_ylabel("Cross-validated decoder ROC-AUC")
+    auc_p_str = f"p<{1 / (auc_perm + 1):.3f}" if auc_p_value == 0 else f"p={auc_p_value:.4f}"
     ax.set_title(f"Rep-accumulated AUC vs. repetition count  "
-                 f"(r={max_rep}: p={auc_p_value:.4f})")
+                 f"(r={max_rep}: {auc_p_str})")
     ax.legend(fontsize=8)
 
     fig.tight_layout()
