@@ -1,0 +1,42 @@
+# Dependencies for p300-speller-multidevice, pinned from the eeg-expy conda
+# env (Python 3.10.20) these scripts were actually run and validated against.
+# Generated via: pip list --format=freeze (not `pip freeze`, which can emit
+# unparseable "@ file://..." lines for conda-installed packages).
+#
+# Install:  pip install -r requirements.txt
+# (works in a plain venv or a conda env's pip -- nothing here needs conda
+# specifically; see the per-workflow notes below for optional extras.)
+
+# --- Core: used by every analysis/decoding script -------------------------
+# (decode_emotivpro.py, pool_sessions.py, visualize_p300.py,
+#  train_classical_multi.py, list_headsets.py, emotiv_cortex_acquisition.py,
+#  p300_speller_experiment_emotiv*.py)
+numpy==1.26.4
+pandas==2.3.3
+scipy==1.15.3
+matplotlib==3.10.9
+mne==1.12.1
+pyriemann==0.11
+scikit-learn==1.7.2
+
+# --- Streaming / hardware I/O ----------------------------------------------
+pylsl==1.16.2                  # all acquisition scripts (LSL producer/consumer)
+websocket-client==1.9.0        # Emotiv Cortex API workflow only
+python-dotenv==1.2.2           # Emotiv Cortex API workflow only (.env credentials)
+pyserial==3.5                  # custom 16-channel serial headset only
+
+# --- Muse2 acquisition (BrainFlow via muselsl) -----------------------------
+# p300_speller_experiment_muse2.py doesn't import brainflow directly -- it
+# consumes an LSL stream that a separately-run `muselsl stream` process
+# publishes. Both are still required for that workflow to work end to end.
+brainflow==5.22.2
+muselsl==2.4.1
+
+# --- NOT installed/verified in the env these versions were pinned from ----
+# Needed only by train_eegnet_multi.py and everything under bnci_benchmark/
+# (the EEGNet decoder + BNCI2014_009 benchmark scripts). Install these
+# yourself if you need those scripts; versions below are unpinned since we
+# haven't run them against a specific pinned version in this project's own
+# dev environment -- pin them once you have, rather than trusting this file.
+# torch
+# moabb

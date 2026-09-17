@@ -350,6 +350,12 @@ scripts, or ask in the project chat for a copy.
 
 ## Dependencies
 
+`requirements.txt` pins the core + per-workflow packages actually verified
+against this project (`pip install -r requirements.txt`); `torch` and
+`moabb` are left unpinned there since they're only needed for
+`train_eegnet_multi.py` / `bnci_benchmark/` and weren't installed in the
+env those pins were taken from. Per-workflow breakdown:
+
 ```
 # all workflows
 numpy pandas scipy scikit-learn matplotlib mne pyriemann torch
@@ -357,8 +363,9 @@ numpy pandas scipy scikit-learn matplotlib mne pyriemann torch
 # 16ch serial headset
 pyserial pylsl
 
-# Muse2
-pylsl brainflow
+# Muse2 (muselsl owns the BLE connection and publishes the LSL stream this
+# project's script consumes; brainflow is muselsl's own dependency)
+pylsl muselsl brainflow
 
 # Emotiv EPOC Flex — EmotivPRO workflow
 pylsl
