@@ -28,6 +28,7 @@ CORTEX_URL = "wss://localhost:6868"
 _BOOKKEEPING_COLS = {
     "COUNTER", "INTERPOLATED", "MARKER_HARDWARE",
     "MARKERS", "RAW_CQ", "BATTERY", "BATTERY_PERCENT",
+    "FwBufferSize", "FwClockTime",
 }
 
 
@@ -212,7 +213,7 @@ class CortexAcquisition(threading.Thread):
         result = client.call("createSession", {
             "cortexToken": self._token,
             "headset": self.headset_id,
-            "status": "open",
+            "status": "active",
         })
         self._session_id = result["id"]
         print(f"[cortex] session: {self._session_id}")

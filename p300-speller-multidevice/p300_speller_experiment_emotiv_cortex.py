@@ -13,6 +13,7 @@ Prerequisites:
     Developer credentials in .env:
         EMOTIV_CLIENT_ID=...
         EMOTIV_CLIENT_SECRET=...
+        EMOTIV_HEADSET_ID=...   (optional; default = first headset Cortex finds)
 
 Run (real experiment):
     python p300_speller_experiment_emotiv_cortex.py --phrase HELLO --reps 15
@@ -338,7 +339,8 @@ def main():
     ap.add_argument("--client-secret", default=None,
                     help="Emotiv Client Secret (default: EMOTIV_CLIENT_SECRET from .env)")
     ap.add_argument("--headset-id", default=None,
-                    help="Emotiv headset ID (default: first found)")
+                    help="Emotiv headset ID (default: EMOTIV_HEADSET_ID from "
+                         ".env, else first found)")
     ap.add_argument("--on_ms",   type=int, default=100)
     ap.add_argument("--off_ms",  type=int, default=75)
     ap.add_argument("--cue_ms",  type=int, default=1000)
@@ -347,6 +349,7 @@ def main():
 
     client_id     = args.client_id     or os.environ.get("EMOTIV_CLIENT_ID")
     client_secret = args.client_secret or os.environ.get("EMOTIV_CLIENT_SECRET")
+    headset_id    = args.headset_id    or os.environ.get("EMOTIV_HEADSET_ID")
     if not client_id or not client_secret:
         ap.error(
             "Cortex credentials not found. "
@@ -381,7 +384,7 @@ def main():
     # --- Gate 1: connect to Cortex + authenticate + discover channels -------
     print("[cortex] connecting ...")
     acq = CortexAcquisition(client_id, client_secret, stop_event,
-                            headset_id=args.headset_id)
+                            headset_id=headset_id)
     acq.connect()
 
     n_eeg     = len(acq.channel_names)

@@ -202,7 +202,11 @@ is missing — see the Cortex EEG license note below).
   ```
   EMOTIV_CLIENT_ID=your_id_here
   EMOTIV_CLIENT_SECRET=your_secret_here
+  EMOTIV_HEADSET_ID=your_headset_id_here   # optional; run list_headsets.py to find it
   ```
+  `EMOTIV_HEADSET_ID` is only needed if more than one headset is paired —
+  omit it and Cortex uses the first one it finds. `--headset-id` on the
+  command line overrides whatever is in `.env`.
 - Emotiv Cortex app (or EmotivPRO) must be **running** before launch — it
   hosts the WebSocket server on port 6868.
 - `pip install websocket-client python-dotenv`
