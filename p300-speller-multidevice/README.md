@@ -29,6 +29,10 @@ p300-speller-multidevice/
 ├── pool_sessions.py                     the imports and the default paths.
 ├── train_classical_multi.py
 ├── train_eegnet_multi.py
+├── analysis/                             Flex QC analyses, scripts, and reports
+│   ├── results/                          Generated tables and figures
+│   └── ...
+├── Dataset/                              26 QC Flex sessions at the directory root
 └── bnci_benchmark/                      BNCI2014_009 decoder benchmark — no
     ├── train_classical_bnci.py          cross-imports and no dependency on
     ├── train_classical_bnci_loso.py     recordings/, so it's split out on
@@ -93,6 +97,56 @@ train_eegnet_bnci.py / train_eegnet_bnci_loso.py           EEGNet on BNCI2014_00
 plot_decoder_comparison.py                                 figure: Classical vs EEGNet, Muse2 sessions
 results_comparison.md                                      written summary of all results above
 ```
+
+## Emotiv Flex QC dataset
+
+Export the QC-passing epochs from `storedRecordings/emotivFlex-batch1/` and
+`storedRecordings/emotivFlex-batch2/` as per-session NPZ files for downstream
+model training:
+
+```powershell
+python analysis/export_flex_qc_dataset.py
+```
+
+This writes `Dataset/` with `epochs_uv` arrays
+(`n_epochs × 32 channels × 57 time points`), flash labels, stimulus code,
+character/repetition indices, channel names, alignment metadata, and a
+`manifest.csv`. The QC rule is median channel robust SD ≤ 10 µV. The rule
+uses noise only, but the threshold was chosen after initial decoding results
+were inspected; it is post hoc, not preregistered. The source recordings are
+not modified. See `Dataset/README.md` for the full format
+and limitations. Subject IDs are absent from the source metadata, so these
+sessions must not be presented as independent-subject validation.
+
+Visualize one exported session and print its array/label composition with:
+
+```powershell
+python analysis/visualize_flex_dataset_session.py batch1_session_005
+```
+
+Export cumulative character predictions for all QC sessions (lag estimation,
+training, and testing all use only the 26 QC-passing sessions):
+
+```powershell
+python analysis/export_flex_cumulative_predictions.py
+```
+
+The individual analysis commands generate intermediate summaries. To combine
+the overview, detailed statistics, run summary, and all per-character
+predictions into the single report, run:
+
+```powershell
+python analysis/build_qc_report.py
+```
+
+The consolidated `analysis/results/REPORT.md` contains all four sections;
+machine-readable CSV tables and figures remain alongside it as supporting
+data. The builder removes the redundant text/Markdown intermediate reports.
+
+`analysis/results/` is kept QC-only: lag estimation, training, evaluation,
+statistics, and prediction tables use the 26 sessions passing the current
+noise QC threshold. Higher-noise sessions remain in the raw source folders
+but are not included in these analysis outputs.
 
 ## Scripts
 

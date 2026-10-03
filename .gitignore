@@ -55,11 +55,16 @@ Thumbs.db
 *.pkl
 *.pickle
 *.npy
-*.npz
 *.joblib
 *.kenlm
 *.kenlm.gz
 *.arpa
+# Reusable Emotiv Flex QC dataset and its analysis artifacts
+!p300-speller-multidevice/Dataset/manifest.csv
+!p300-speller-multidevice/Dataset/**/*.csv
+!p300-speller-multidevice/Dataset/**/*.png
+!p300-speller-multidevice/analysis/results/**/*.csv
+!p300-speller-multidevice/analysis/results/**/*.png
 results/*
 !results/.gitkeep
 models/*

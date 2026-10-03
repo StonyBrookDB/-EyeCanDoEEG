@@ -1,0 +1,19 @@
+{
+  "dataset_name": "Emotiv Flex P300 QC epochs",
+  "version": 1,
+  "n_sessions": 26,
+  "n_characters": 150,
+  "n_epochs": 26605,
+  "n_targets": 4434,
+  "qc_rule": "median channel robust SD <= 10.0 uV",
+  "qc_threshold_note": "Post hoc threshold chosen after inspecting initial decoding; not preregistered.",
+  "source_batches": [
+    "emotivFlex-batch1",
+    "emotivFlex-batch2"
+  ],
+  "subject_id": null,
+  "subject_id_note": "Source metadata does not identify subjects; do not claim cross-subject validation.",
+  "format": "one compressed NPZ and one JSON sidecar per session; see README.md",
+  "generated_by": "export_flex_qc_dataset.py",
+  "generated_at_utc": "2026-10-02T21:38:50.169459+00:00"
+}
